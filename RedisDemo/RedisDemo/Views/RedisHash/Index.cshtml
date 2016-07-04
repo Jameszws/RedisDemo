@@ -1,0 +1,289 @@
+﻿@{
+    ViewBag.Title = "hash 存储";
+    Layout = @Url.Content("~/Views/Shared/_CommonLayout.cshtml");
+}
+
+@section head{
+    <style>
+        input[type=button] {
+            margin-left: 20px;
+        }
+
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+        thead td {
+            text-align: center;
+        }
+
+        td {
+            border: 1px solid black;
+        }
+
+        .divH {
+            width: 99%;
+            margin-top: 10px;
+            display: inline-block;
+            border: 1px solid black;
+            margin-left: 2px;
+        }
+
+        .divS {
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            color: blue;
+        }
+    </style>
+}
+
+@section body{
+    <div style="width: 1000px; height: 450px; margin: 0px auto;">
+        <div style="width: 500px; height: 100%; float: left">
+
+            <div style="height: 100px;" class="divH">
+                <div class="divS">
+                    添加部分
+                </div>
+                <div style="width: 100%; height: 70px;">
+                    <div style="width: 200px; float: left; height: 100%">
+                        <input type="button" id="btnAdd" value="添加" />
+                    </div>
+                    <div style="width: 260px; border: 1px solid black; float: left; height: 80%;">
+                        <div style="width: 100%; margin-top: 5px;">
+                            名称:<input type="text" value="" id="addUserName" />
+                        </div>
+                        <div style="width: 100%; margin-top: 5px;">
+                            职位:<input type="text" value="" id="addUserPosition" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height: 100px;" class="divH">
+                <div class="divS">
+                    修改部分
+                </div>
+                <div style="width: 100%; height: 70px;">
+                    <div style="width: 200px; float: left; height: 100%">
+                        <div style="width: 100%">
+                            ID:<input type="text" value="" id="updateUserId" />
+                        </div>
+                        <div style="width: 100%">
+                            <input type="button" id="btnUpdate" value="修改" />
+                        </div>
+
+                    </div>
+                    <div style="width: 260px; border: 1px solid black; float: left; height: 80%;">
+                        <div style="width: 100%; margin-top: 5px;">
+                            名称:<input type="text" value="" id="updateUserName" />
+                        </div>
+                        <div style="width: 100%; margin-top: 5px;">
+                            职位:<input type="text" value="" id="updateUserPosition" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height: 100px;" class="divH">
+                <div class="divS">
+                    获取单个员工信息部分
+                </div>
+                <div style="width: 100%; height: 70px;">
+                    <div style="width: 200px; float: left; height: 100%">
+                        ID:<input type="text" value="" id="userId" />
+                        <input type="button" id="btnGet" value="获取单个" />
+                    </div>
+                    <div id="userInfo" style="width: 260px; border: 1px solid black; float: left; height: 90%;">
+                    </div>
+                </div>
+            </div>
+
+            <div style="height: 80px;" class="divH">
+                <div class="divS">
+                    删除部分
+                </div>
+                <div style="width: 100%; height: 50px;">
+                    <div style="width: 100%">
+                        ID:<input type="text" value="" id="delUserId" />
+                    </div>
+                    <div style="width: 100%">
+                        <input type="button" id="btnDelete" value="删除" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div style="width: 490px; border-left: 1px solid black; height: 100%; float: left;">
+            <div style="height: 60px; line-height: 60px;">
+                <input type="button" id="btnGetAll" value="获取所有" style="color: red" />
+            </div>
+            <div style="width: 100%; line-height: 30px; height: 30px; text-indent: 2em">
+                员工信息列表:
+            </div>
+            <div id="showInfo" style="width: 100%; height: 450px; overflow: auto">
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts{
+    <script>
+        $(function () {
+
+            $("input:text").val("");
+
+            $("#btnAdd").click(function () {
+                var addUserName = $("#addUserName").val().trim();
+                var addUserPosition = $("#addUserPosition").val().trim();
+                if (addUserName == "" || addUserPosition == "") {
+                    alert("名称和职位都不能为空！");
+                    return;
+                }
+                $.ajax({
+                    url: "/redishash/add",
+                    data: { userName: addUserName, position: addUserPosition },
+                    type: "post",
+                    success: function (ret) {
+                        var data = $.parseJSON(ret);
+                        if (data.Code === "0") {
+                            alert(data.Msg);
+                            return;
+                        }
+                        alert("success!");
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+
+            });
+
+            $("#btnUpdate").click(function () {
+                var updateUserName = $("#updateUserName").val().trim();
+                var updateUserPosition = $("#updateUserPosition").val().trim();
+                if (updateUserName == "" || updateUserPosition == "") {
+                    alert("名称和职位都不能为空！");
+                    return;
+                }
+
+                var userId = $("#updateUserId").val().trim();
+                $.ajax({
+                    url: "/redishash/update",
+                    data: { id: userId, userName: updateUserName, position: updateUserPosition },
+                    type: "post",
+                    success: function (ret) {
+                        var data = $.parseJSON(ret);
+                        if (data.Code === "0") {
+                            alert(data.Msg);
+                            return;
+                        }
+                        alert("success!");
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+            });
+
+            $("#btnDelete").click(function () {
+                var id = $("#delUserId").val().trim();
+                if (id == "") {
+                    alert("ID不能为空！");
+                    return;
+                }
+                $.ajax({
+                    url: "/redishash/delete",
+                    data: { id: id },
+                    type: "post",
+                    success: function (ret) {
+                        var data = $.parseJSON(ret);
+                        if (data.Code === "0") {
+                            alert(data.Msg);
+                            return;
+                        }
+                        alert("success!");
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+            });
+
+            $("#btnGet").click(function () {
+                var id = $("#userId").val().trim();
+                if (id == "") {
+                    alert("ID不能为空！");
+                    return;
+                }
+                $("#userInfo").html("");
+                $.ajax({
+                    url: "/redishash/get",
+                    data: { id: id },
+                    type: "post",
+                    success: function (ret) {
+                        var data = $.parseJSON(ret).Data;
+                        var code = $.parseJSON(ret).Code;
+                        if (code === "0") {
+                            alert(data.Msg);
+                            return;
+                        }
+                        var html = "";
+                        html += "<div style='width:100%'>编号：" + data.Id + "</div>";
+                        html += "<div style='width:100%'>名称 :" + data.UserName + "</div>";
+                        html += "<div style='width:100%'>职位：" + data.Job.Position + "</div>";
+                        $("#userInfo").html(html);
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+            });
+
+            $("#btnGetAll").click(function () {
+                $("#showInfo").html("");
+                $.ajax({
+                    url: "/redishash/getall",
+                    type: "post",
+                    success: function (ret) {
+                        var data = $.parseJSON(ret).Data;
+                        var htmlInfo = "";
+                        htmlInfo += "<table border='0' cellspacing='0'>";
+                        var count = 1;
+                        htmlInfo += "   <thead bgcolor='#9D9FAA'>";
+                        htmlInfo += "       <tr>";
+                        htmlInfo += "           <td style='width:auto;'>编号</td>";
+                        htmlInfo += "           <td style='width:200px'>ID</td>";
+                        htmlInfo += "           <td style='width:80px'>名称</td>";
+                        htmlInfo += "           <td style='width:120px'>职位</td>";
+                        htmlInfo += "       </tr>";
+                        htmlInfo += "   </thead>";
+                        for (var i = 0; i < data.length; i++) {
+
+                            htmlInfo += "   <tr>";
+                            htmlInfo += "       <td>" + count + "</td>";
+                            htmlInfo += "       <td style='text-align:center'>" + data[i].Id + "</td>";
+                            htmlInfo += "       <td>" + data[i].UserName + "</td>";
+                            htmlInfo += "       <td>" + data[i].Job.Position + "</td>";
+                            htmlInfo += "   </tr>";
+                            count++;
+
+                        }
+                        htmlInfo += "</table>";
+                        $("#showInfo").html(htmlInfo);
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+            });
+
+        });
+    </script>
+}
+
+
+

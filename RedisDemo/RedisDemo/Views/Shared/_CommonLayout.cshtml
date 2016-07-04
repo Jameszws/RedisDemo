@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>测试项目</title>
+
+    @Scripts.Render("~/bundles/modernizr")
+
+    @RenderSection("head", required: false)
+</head>
+<body>
+    <div style="width: 1000px; height: auto; margin: 0px auto;">
+        @RenderSection("body", required: false)
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
